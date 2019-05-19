@@ -1,0 +1,5 @@
+C:\Users\PRO\Desktop\Lime\Apks\iap\iap\obj\x86\Debug\Ninebot_ESC2_IAP_V1.2_20181010.csprojAssemblyReference.cache
+C:\Users\PRO\Desktop\Lime\Apks\iap\iap\obj\x86\Debug\IAP.IAP_Form.resources
+C:\Users\PRO\Desktop\Lime\Apks\iap\iap\obj\x86\Debug\IAP.Properties.Resources.resources
+C:\Users\PRO\Desktop\Lime\Apks\iap\iap\obj\x86\Debug\Ninebot_ESC2_IAP_V1.2_20181010.csproj.GenerateResource.cache
+C:\Users\PRO\Desktop\Lime\Apks\iap\iap\obj\x86\Debug\Ninebot_ESC2_IAP_V1.2_20181010.csproj.CoreCompileInputs.cache
