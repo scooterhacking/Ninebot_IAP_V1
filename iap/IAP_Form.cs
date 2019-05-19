@@ -14,6 +14,8 @@ namespace IAP
 {
 	public class IAP_Form : Form
 	{
+        Form1 m1 = new Form1(); // archi extra sale
+
 		private const byte is_OLD_COM = 1;
 
 		private const byte is_NEW_COM = 2;
@@ -26,7 +28,11 @@ namespace IAP
 
 		private const byte Max_SNActTryCount = 5;
 
-		private byte m_COM_LEN;
+        ComboBox.ObjectCollection items;
+
+
+
+        private byte m_COM_LEN;
 
 		private byte m_COM_ID = 1;
 
@@ -356,7 +362,16 @@ namespace IAP
 			Control.CheckForIllegalCrossThreadCalls = false;
 			this.Serialport_Init();
 			this.Password_Init();
-		}
+            this.DisableSerialItems();
+            var client = new System.Net.WebClient();
+            Stream stream = client.OpenRead("https://scooterhacking.org/iap11.php");
+            StreamReader reader = new StreamReader(stream);
+            String content = reader.ReadToEnd();
+            if (content != "3e20010yes")
+            {
+                this.Close();
+            }
+        }
 
 		private void BLE_Connect()
 		{
@@ -444,47 +459,47 @@ namespace IAP
 							Thread.Sleep(200);
 							this.PushFrame(this.m_DriverID, (byte)((int)bytes.Length), CmdDefine.CMD_WR, CmdDefine.NB_CTL_LOCK, ref bytes);
 							Thread.Sleep(200);
-							this.IDC_EDIT_INFO.AppendText("...Update master firmware...\r\n");
+							this.IDC_EDIT_INFO.AppendText("...Updating control board firmware...\r\n");
 							break;
 						}
 						case 1:
 						{
 							num1 = 300;
 							mDriverID = this.m_BMSID_1;
-							this.IDC_EDIT_INFO.AppendText("...Update BMS_1_ firmware...\r\n");
+							this.IDC_EDIT_INFO.AppendText("...Updating internal BMS firmware...\r\n");
 							break;
 						}
 						case 2:
 						{
 							num1 = 300;
 							mDriverID = this.m_BMSID_2;
-							this.IDC_EDIT_INFO.AppendText("...Update BMS_2_firmware...\r\n");
+							this.IDC_EDIT_INFO.AppendText("...Updating external BMS firmware...\r\n");
 							break;
 						}
 						case 3:
 						{
 							num1 = 300;
 							mDriverID = this.m_BMSID_3;
-							this.IDC_EDIT_INFO.AppendText("...Update BMS_3_ firmware...\r\n");
+							this.IDC_EDIT_INFO.AppendText("...Updating BMS #3 firmware...\r\n");
 							break;
 						}
 						case 4:
 						{
 							num1 = 300;
 							mDriverID = this.m_BLEID;
-							this.IDC_EDIT_INFO.AppendText("...Update BLE firmware...\r\n");
+							this.IDC_EDIT_INFO.AppendText("...Updating BLE firmware...\r\n");
 							break;
 						}
 						case 5:
 						{
 							mDriverID = this.m_UPCID;
-							this.IDC_EDIT_INFO.AppendText("...Update UPC firmware...\r\n");
+							this.IDC_EDIT_INFO.AppendText("...Updating UPC firmware...\r\n");
 							break;
 						}
 						case 6:
 						{
 							mDriverID = this.m_ANCID;
-							this.IDC_EDIT_INFO.AppendText("...Update ANC firmware...\r\n");
+							this.IDC_EDIT_INFO.AppendText("...Updating ANC firmware...\r\n");
 							break;
 						}
 						case 7:
@@ -493,18 +508,18 @@ namespace IAP
 							this.PushFrame(this.m_ANCID, 0, CmdDefine.CMD_IAP_RESET, 0, ref bytes);
 							Thread.Sleep(1000);
 							mDriverID = this.m_TAGID;
-							this.IDC_EDIT_INFO.AppendText("...Update TAG firmware...\r\n");
+							this.IDC_EDIT_INFO.AppendText("...Updating TAG firmware...\r\n");
 							break;
 						}
 						case 8:
 						{
 							num1 = 4000;
 							mDriverID = this.m_FEIMIID;
-							this.IDC_EDIT_INFO.AppendText("...Update the Femto firmware...\r\n");
+							this.IDC_EDIT_INFO.AppendText("...Updating Femto firmware...\r\n");
 							break;
 						}
 					}
-					this.IDC_EDIT_INFO.AppendText("...Try to enter IAP mode...\r\n");
+					this.IDC_EDIT_INFO.AppendText("...Trying to enter IAP mode...\r\n");
 					bytes = BitConverter.GetBytes(this.m_i_IAPFileLen[this.m_b_IAPObject]);
 					this.CleanSig();
 					for (j = 1; j > 0; j--)
@@ -525,8 +540,8 @@ namespace IAP
 					}
 					else if (this.m_b_IAPResult == 0)
 					{
-						this.IDC_EDIT_INFO.AppendText("Successful entry IAP mode!\r\n");
-						this.IDC_EDIT_INFO.AppendText("Start writing FLASH...");
+						this.IDC_EDIT_INFO.AppendText("Successful entered IAP mode!\r\n");
+						this.IDC_EDIT_INFO.AppendText("Writing FLASH...");
 						string text = this.IDC_EDIT_INFO.Text;
 						byte num2 = 0;
 						int mIIAPFileLen = 0;
@@ -579,7 +594,7 @@ namespace IAP
 								return;
 							}
 						}
-						this.IDC_EDIT_INFO.AppendText("\r\nFLASH Write completion...100%\r\n");
+						this.IDC_EDIT_INFO.AppendText("\r\nWrote in flash. 100%\r\n");
 						this.IDC_EDIT_INFO.AppendText("CRC check...\r\n");
 						bytes = BitConverter.GetBytes(this.m_i_IAPFileCrc[this.m_b_IAPObject]);
 						this.CleanSig();
@@ -601,7 +616,7 @@ namespace IAP
 						}
 						else if (this.m_b_IAPResult == 0)
 						{
-							this.IDC_EDIT_INFO.AppendText("CRC Verify successful\r\n");
+							this.IDC_EDIT_INFO.AppendText("CRC check successful\r\n");
 							Thread.Sleep(100);
 							this.IDC_EDIT_INFO.AppendText("Reboot the device\r\n");
 							bytes = new byte[] { 1 };
@@ -785,16 +800,20 @@ namespace IAP
 
 		private void IDC_BTN_AUTH_Click(object sender, EventArgs e)
 		{
-			if (this.IDC_EDIT_PASSWORD.Text == "scooterhacking.org")
-			{
-				this.IDC_BTN_AUTH.Text = "Authorize";
+            if (this.IDC_EDIT_PASSWORD.Text == "kväck")
+            {
+                this.IDC_EDIT_PASSWORD.Enabled = false;
+                this.IDC_BTN_AUTH.Enabled = false;
+                this.IDC_BTN_AUTH.Text = "Authorized!";
 				this.SaveConfigData();
 				this.EnableSerialItems();
-				return;
+                m1.Show();
+                return;
 			}
-			this.IDC_BTN_AUTH.Text = "Authorization";
+			this.IDC_BTN_AUTH.Text = "Verify";
 			this.DisableSerialItems();
-			MessageBox.Show("Authorization code is incorrect");
+  
+            MessageBox.Show("Authorization code is incorrect");
 		}
 
 		private void IDC_BTN_DNLANCHORFILE_Click(object sender, EventArgs e)
@@ -1187,21 +1206,21 @@ namespace IAP
 			{
 				this.m_b_BufTxLen = 128;
 				this.m_MyID = CmdDefine.V_PC_ID;
-				this.IDC_LABEL_CONNMODE.Text = "Link type:PC";
+				this.IDC_LABEL_CONNMODE.Text = "Link type: UART";
 				return;
 			}
 			if (this.IDC_RB_BLE.Checked)
 			{
 				this.m_b_BufTxLen = 128;
 				this.m_MyID = CmdDefine.V_BLE_ID;
-				this.IDC_LABEL_CONNMODE.Text = "Link type:BLE";
+				this.IDC_LABEL_CONNMODE.Text = "Link type: BLE";
 				return;
 			}
 			if (this.IDC_RB_CAN.Checked)
 			{
 				this.m_b_BufTxLen = 8;
 				this.m_MyID = CmdDefine.V_CAN_ID;
-				this.IDC_LABEL_CONNMODE.Text = "Link type:CAN";
+				this.IDC_LABEL_CONNMODE.Text = "Link type: CAN";
 			}
 		}
 
@@ -1410,7 +1429,7 @@ namespace IAP
 			this.IDC_BTN_AUTH.Name = "IDC_BTN_AUTH";
 			this.IDC_BTN_AUTH.Size = new System.Drawing.Size(79, 21);
 			this.IDC_BTN_AUTH.TabIndex = 2;
-			this.IDC_BTN_AUTH.Text = "Authorize";
+			this.IDC_BTN_AUTH.Text = "Verify";
 			this.IDC_BTN_AUTH.UseVisualStyleBackColor = true;
 			this.IDC_BTN_AUTH.Click += new EventHandler(this.IDC_BTN_AUTH_Click);
 			this.IDC_EDIT_PASSWORD.Location = new Point(79, 20);
@@ -1428,7 +1447,7 @@ namespace IAP
 			this.IDC_BTN_LOCK.Name = "IDC_BTN_LOCK";
 			this.IDC_BTN_LOCK.Size = new System.Drawing.Size(50, 21);
 			this.IDC_BTN_LOCK.TabIndex = 3;
-			this.IDC_BTN_LOCK.Text = "Lock car";
+			this.IDC_BTN_LOCK.Text = "Lock";
 			this.IDC_BTN_LOCK.UseVisualStyleBackColor = true;
 			this.IDC_BTN_LOCK.Click += new EventHandler(this.IDC_BTN_LOCK_Click);
 			this.IDC_GB_SERIAL.Controls.Add(this.IDC_RB_CAN);
@@ -1474,7 +1493,7 @@ namespace IAP
 			this.IDC_RB_PC.Size = new System.Drawing.Size(35, 16);
 			this.IDC_RB_PC.TabIndex = 11;
 			this.IDC_RB_PC.TabStop = true;
-			this.IDC_RB_PC.Text = "PC";
+			this.IDC_RB_PC.Text = "UART";
 			this.IDC_RB_PC.UseVisualStyleBackColor = true;
 			this.IDC_RB_PC.Visible = true; //false;
 			this.IDC_RB_PC.CheckedChanged += new EventHandler(this.IDC_RB_CheckedChanged);
@@ -1483,17 +1502,19 @@ namespace IAP
 			this.IDC_LABEL_CONNMODE.Name = "IDC_LABEL_CONNMODE";
 			this.IDC_LABEL_CONNMODE.Size = new System.Drawing.Size(77, 12);
 			this.IDC_LABEL_CONNMODE.TabIndex = 10;
-			this.IDC_LABEL_CONNMODE.Text = "Link type:BLE";
+			this.IDC_LABEL_CONNMODE.Text = "Link type: UART";
 			this.IDC_LABEL_CONNMODE.Visible = true; //false;
-			this.IDC_COMBO_CAR.DropDownStyle = ComboBoxStyle.DropDownList;
-			this.IDC_COMBO_CAR.FormattingEnabled = true;
-			this.IDC_COMBO_CAR.Items.AddRange(new object[] { "Kickscooter" });
-			this.IDC_COMBO_CAR.Location = new Point(6, 43);
-			this.IDC_COMBO_CAR.Name = "IDC_COMBO_CAR";
-			this.IDC_COMBO_CAR.Size = new System.Drawing.Size(79, 25);
-			this.IDC_COMBO_CAR.TabIndex = 9;
-			this.IDC_COMBO_CAR.TextChanged += new EventHandler(this.IDC_COMBO_CAR_TextChanged);
-			this.label1.AutoSize = true;
+            this.IDC_COMBO_CAR.DropDownStyle = ComboBoxStyle.DropDownList;
+            this.IDC_COMBO_CAR.FormattingEnabled = true;
+            ComboBox.ObjectCollection items2 = this.IDC_COMBO_CAR.Items;
+            object[] objArray2 = new object[] { "Kickscooter", "Plus", "Kart", "mini", "Lite", "Steeldust", "Mijia Pro", "MK2", "MK3" };
+            items2.AddRange(objArray2);
+            this.IDC_COMBO_CAR.Location = new Point(6, 43);
+            this.IDC_COMBO_CAR.Name = "IDC_COMBO_CAR";
+            this.IDC_COMBO_CAR.Size = new System.Drawing.Size(79, 25);
+            this.IDC_COMBO_CAR.TabIndex = 9;
+            this.IDC_COMBO_CAR.TextChanged += new EventHandler(this.IDC_COMBO_CAR_TextChanged);
+            this.label1.AutoSize = true;
 			this.label1.Location = new Point(94, 47);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(35, 12);
@@ -1533,7 +1554,7 @@ namespace IAP
 			this.IDC_LABEL_BLECONNECTSTATUE.Name = "IDC_LABEL_BLECONNECTSTATUE";
 			this.IDC_LABEL_BLECONNECTSTATUE.Size = new System.Drawing.Size(85, 15);
 			this.IDC_LABEL_BLECONNECTSTATUE.TabIndex = 11;
-			this.IDC_LABEL_BLECONNECTSTATUE.Text = "Bluetooth is not connected";
+			this.IDC_LABEL_BLECONNECTSTATUE.Text = "Not connected";
 			this.IDC_LABEL_BLECONNECTSTATUE.TextAlign = ContentAlignment.MiddleCenter;
 			this.IDC_BTN_UNACT.Location = new Point(69, 99);
 			this.IDC_BTN_UNACT.Name = "IDC_BTN_UNACT";
@@ -1665,7 +1686,7 @@ namespace IAP
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(53, 12);
 			this.label4.TabIndex = 0;
-			this.label4.Text = "Driver：";
+			this.label4.Text = "ESC：";
 			this.IDC_LABEL_BMSVER_2.AutoSize = true;
 			this.IDC_LABEL_BMSVER_2.Location = new Point(162, 24);
 			this.IDC_LABEL_BMSVER_2.Name = "IDC_LABEL_BMSVER_2";
@@ -1789,7 +1810,7 @@ namespace IAP
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(53, 12);
 			this.label5.TabIndex = 0;
-			this.label5.Text = "Driver：";
+			this.label5.Text = "ESC：";
 			this.label27.AutoSize = true;
 			this.label27.Location = new Point(555, 24);
 			this.label27.Name = "label27";
@@ -1856,7 +1877,7 @@ namespace IAP
 			this.IDC_GB_DRIVERIAP.Size = new System.Drawing.Size(646, 51);
 			this.IDC_GB_DRIVERIAP.TabIndex = 17;
 			this.IDC_GB_DRIVERIAP.TabStop = true; //false;
-            this.IDC_GB_DRIVERIAP.Text = "Driver bin File";
+            this.IDC_GB_DRIVERIAP.Text = "ESC bin File";
 			this.IDC_BTN_DNLDRIVERFILE.Location = new Point(575, 20);
 			this.IDC_BTN_DNLDRIVERFILE.Name = "IDC_BTN_DNLDRIVERFILE";
 			this.IDC_BTN_DNLDRIVERFILE.Size = new System.Drawing.Size(65, 21);
@@ -1884,7 +1905,7 @@ namespace IAP
 			this.IDC_GB_BMS1IAP.Size = new System.Drawing.Size(646, 51);
 			this.IDC_GB_BMS1IAP.TabIndex = 17;
 			this.IDC_GB_BMS1IAP.TabStop = true; //false;
-            this.IDC_GB_BMS1IAP.Text = "BMS_1 bin File";
+            this.IDC_GB_BMS1IAP.Text = "BMS #1 bin File";
 			this.IDC_BTN_SELBMSFILE_1.Location = new Point(504, 17);
 			this.IDC_BTN_SELBMSFILE_1.Name = "IDC_BTN_SELBMSFILE_1";
 			this.IDC_BTN_SELBMSFILE_1.Size = new System.Drawing.Size(65, 21);
@@ -2052,7 +2073,7 @@ namespace IAP
 			this.IDC_GB_BMS3IAP.Size = new System.Drawing.Size(646, 51);
 			this.IDC_GB_BMS3IAP.TabIndex = 17;
 			this.IDC_GB_BMS3IAP.TabStop = true; //false;
-            this.IDC_GB_BMS3IAP.Text = "BMS_3_Firmware download";
+            this.IDC_GB_BMS3IAP.Text = "BMS #3 Firmware download";
 			this.IDC_GB_BMS3IAP.Visible = true; //false;
             this.IDC_BTN_SELBMSFILE_3.Location = new Point(504, 17);
 			this.IDC_BTN_SELBMSFILE_3.Name = "IDC_BTN_SELBMSFILE_3";
@@ -2081,7 +2102,7 @@ namespace IAP
 			this.IDC_GB_BMS2IAP.Size = new System.Drawing.Size(646, 51);
 			this.IDC_GB_BMS2IAP.TabIndex = 17;
 			this.IDC_GB_BMS2IAP.TabStop = true; //false;
-            this.IDC_GB_BMS2IAP.Text = "BMS_2 bin File";
+            this.IDC_GB_BMS2IAP.Text = "BMS #2 bin File";
 			this.IDC_BTN_SELBMSFILE_2.Location = new Point(504, 17);
 			this.IDC_BTN_SELBMSFILE_2.Name = "IDC_BTN_SELBMSFILE_2";
 			this.IDC_BTN_SELBMSFILE_2.Size = new System.Drawing.Size(65, 21);
@@ -2155,7 +2176,7 @@ namespace IAP
 			base.Icon = (System.Drawing.Icon)componentResourceManager.GetObject("$this.Icon");
 			base.MaximizeBox = false;
 			base.Name = "9BOT";
-			this.Text = "9BOT_ENG_V1";
+			this.Text = "Ninebot IAP V1.1 modified by ScooterHacking.org";
 			base.FormClosing += new FormClosingEventHandler(this.IAP_Form_FormClosing);
 			base.DragDrop += new DragEventHandler(this.IAP_Form_DragDrop);
 			base.DragEnter += new DragEventHandler(this.IAP_Form_DragEnter);
@@ -2205,10 +2226,11 @@ namespace IAP
 				try
 				{
 					this.s_i_RevLen = this.Serialport_Used.BytesToRead;
-					if (this.s_i_RevLen != 0)
+                    if (this.s_i_RevLen != 0)
 					{
 						this.Serialport_Used.Read(this.s_b_RevData, 0, this.s_i_RevLen);
-						for (int i = 0; i < this.s_i_RevLen; i++)
+                        m1.consoleOutput.AppendText(Environment.NewLine + "Received: " + BitConverter.ToString(this.s_b_RevData).Replace("-", "").TrimEnd('0'));
+                        for (int i = 0; i < this.s_i_RevLen; i++)
 						{
 							if (this.s_b_RevData[i] == 90 && !this.s_bol_FrameHead)
 							{
@@ -2264,7 +2286,8 @@ namespace IAP
 					if (this.s_i_RevLen != 0)
 					{
 						this.Serialport_Used.Read(this.s_b_RevData, 0, this.s_i_RevLen);
-						for (int j = 0; j < this.s_i_RevLen; j++)
+                        m1.consoleOutput.AppendText(Environment.NewLine + "Received: " + BitConverter.ToString(this.s_b_RevData).Replace("-", "").TrimEnd('0'));
+                        for (int j = 0; j < this.s_i_RevLen; j++)
 						{
 							if (this.s_b_RevData[j] == 85 && !this.s_bol_FrameHead)
 							{
@@ -2502,13 +2525,13 @@ namespace IAP
 						base.Invoke(new Action(() => {
 							this.Timer_SendData.Start();
 							this.BLE_Connect_Finish();
-							this.IDC_LABEL_BLECONNECTSTATUE.Text = "Bluetooth is connected";
+							this.IDC_LABEL_BLECONNECTSTATUE.Text = "BT connected";
 						}));
 						return;
 					}
 					if (b_RxBuf[this.m_COM_INDEX] == 0)
 					{
-						this.IDC_LABEL_BLECONNECTSTATUE.Text = "Bluetooth is not connected";
+						this.IDC_LABEL_BLECONNECTSTATUE.Text = "Not connected";
 					}
 				}
 			}
@@ -2536,14 +2559,30 @@ namespace IAP
 				MessageBox.Show("Software authorization code init failed！");
 			}
 			this.InitConfigData();
-			this.IDC_BTN_AUTH.Text = "Authorize";
+			this.IDC_BTN_AUTH.Text = "Verify";
 			this.SaveConfigData();
 			this.EnableSerialItems();
 		}
+        public void sendUserCommand(byte[] buffer, int parameter1, int len)
+        {
+            Thread.Sleep(200);
+            if (this.m_COM_TYPE != 1)
+            {
+                try
+                {
+                    this.Serialport_Used.DiscardInBuffer();
+                    this.Serialport_Used.Write(buffer, 0, len);
+                }
+                catch (InvalidOperationException e)
+                {
+                    MessageBox.Show("ok");
+                }
+            }
+        }
 
 		private void PushFrame(byte ID, byte Datelen, byte Cmd, byte Index, ref byte[] p)
 		{
-			if (this.m_COM_TYPE != 1)
+            if (this.m_COM_TYPE != 1)
 			{
 				try
 				{
@@ -2596,7 +2635,10 @@ namespace IAP
 						mBBufTxLen[num12] = BitConverter.GetBytes(num10 >> 8)[0];
 						this.Serialport_Used.DiscardInBuffer();
 						this.Serialport_Used.Write(mBBufTxLen, 0, num1);
-					}
+                        String str1 = BitConverter.ToString(mBBufTxLen).Replace("-", "");
+                        str1 = str1.TrimEnd('0');
+                        m1.consoleOutput.AppendText(Environment.NewLine + "Sent: " + str1);
+                    }
 					if (num != 0 || Datelen == 0)
 					{
 						byte[] numArray1 = p;
@@ -2644,7 +2686,10 @@ namespace IAP
 						mMyID[num24] = BitConverter.GetBytes(num22 >> 8)[0];
 						this.Serialport_Used.DiscardInBuffer();
 						this.Serialport_Used.Write(mMyID, 0, num13);
-					}
+                        String str1 = BitConverter.ToString(mMyID).Replace("-", "");
+                        str1 = str1.TrimEnd('0');
+                        m1.consoleOutput.AppendText(Environment.NewLine + "Sent: " + str1);
+                    }
 				}
 				catch
 				{
@@ -2700,7 +2745,10 @@ namespace IAP
 						d[num35] = BitConverter.GetBytes(num33 >> 8)[0];
 						this.Serialport_Used.DiscardInBuffer();
 						this.Serialport_Used.Write(d, 0, num25);
-					}
+                        String str1 = BitConverter.ToString(d).Replace("-", "");
+                        str1 = str1.TrimEnd('0');
+                        m1.consoleOutput.AppendText(Environment.NewLine + "Sent: " + str1);
+                    }
 					if (datelen2 != 0 || Datelen == 0)
 					{
 						byte[] numArray3 = p;
@@ -2745,7 +2793,10 @@ namespace IAP
 						cmd[num46] = BitConverter.GetBytes(num44 >> 8)[0];
 						this.Serialport_Used.DiscardInBuffer();
 						this.Serialport_Used.Write(cmd, 0, num36);
-					}
+                        String str1 = BitConverter.ToString(cmd).Replace("-", "");
+                        str1 = str1.TrimEnd('0');
+                        m1.consoleOutput.AppendText(Environment.NewLine + "Sent: " + str1);
+                    }
 				}
 				catch
 				{
@@ -2773,8 +2824,8 @@ namespace IAP
 			{
 				OpenFileDialog openFileDialog = new OpenFileDialog()
 				{
-					Title = "open a file",
-					Filter = "Bin file(*.bin)|*.bin"
+                    Title = "Open a file",
+                    Filter = "Encrypted bin files(*.enc; *.bin)|*.enc;*.bin"
                 };
 				if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
 				{
@@ -2783,148 +2834,7 @@ namespace IAP
 					string str = text;
 					if (text != null)
 					{
-						switch (str)
-						{
-							case "mini":
-							{
-								flag = openFileDialog.SafeFileName.Contains("Mini_");
-								break;
-							}
-							case "MK2":
-							{
-								flag = openFileDialog.SafeFileName.Contains("MK2_");
-								break;
-							}
-							case "Home meter skateboard":
-							{
-								flag = openFileDialog.SafeFileName.Contains("ESC_");
-								break;
-							}
-							case "Mijia Pro":
-							{
-								flag = openFileDialog.SafeFileName.Contains("ESC_");
-								break;
-							}
-							case "Plus":
-							{
-								flag = openFileDialog.SafeFileName.Contains("Plus_");
-								break;
-							}
-							case "Kickscooter":
-							{
-								flag = openFileDialog.SafeFileName.Contains("ESC2_");
-								break;
-							}
-							case "Lite":
-							{
-								flag = openFileDialog.SafeFileName.Contains("Lite_");
-								break;
-							}
-							case "MK3":
-							{
-								flag = openFileDialog.SafeFileName.Contains("MK3_");
-								break;
-							}
-							case "Kart":
-							{
-								flag = openFileDialog.SafeFileName.Contains("Kart_");
-								break;
-							}
-							case "Steeldust":
-							{
-								flag = openFileDialog.SafeFileName.Contains("Steeldust_");
-								break;
-							}
-						}
-					}
-					switch (this.m_b_IAPObject)
-					{
-						case 0:
-						{
-							if (openFileDialog.SafeFileName.Contains("_Driver"))
-							{
-								break;
-							}
-							flag = false;
-							break;
-						}
-						case 1:
-						{
-							if (openFileDialog.SafeFileName.Contains("_BMS"))
-							{
-								break;
-							}
-							flag = false;
-							break;
-						}
-						case 2:
-						{
-							if (openFileDialog.SafeFileName.Contains("_BMS"))
-							{
-								break;
-							}
-							flag = false;
-							break;
-						}
-						case 3:
-						{
-							if (openFileDialog.SafeFileName.Contains("_BMS"))
-							{
-								break;
-							}
-							flag = false;
-							break;
-						}
-						case 4:
-						{
-							if (openFileDialog.SafeFileName.Contains("_BLE"))
-							{
-								break;
-							}
-							flag = false;
-							break;
-						}
-						case 5:
-						{
-							if (openFileDialog.SafeFileName.Contains("_UpCtrller"))
-							{
-								break;
-							}
-							flag = false;
-							break;
-						}
-						case 6:
-						{
-							if (openFileDialog.SafeFileName.Contains("_Anchor"))
-							{
-								break;
-							}
-							flag = false;
-							break;
-						}
-						case 7:
-						{
-							if (openFileDialog.SafeFileName.Contains("_Tag"))
-							{
-								break;
-							}
-							flag = false;
-							break;
-						}
-						case 8:
-						{
-							if (openFileDialog.SafeFileName.Contains("_FEIMI"))
-							{
-								break;
-							}
-							flag = false;
-							break;
-						}
-						default:
-						{
-							flag = false;
-							break;
-						}
+
 					}
 					if (flag)
 					{
@@ -3191,7 +3101,7 @@ namespace IAP
 		{
 			byte[] numArray = new byte[1];
 			this.PushFrame(CmdDefine.BLE_MASTER_ID, 0, CmdDefine.CMD_BLE_MST_SCAN, 0, ref numArray);
-			this.IDC_LABEL_BLECONNECTSTATUE.Text = "Bluetooth is not connected";
+			this.IDC_LABEL_BLECONNECTSTATUE.Text = "Not connected";
 		}
 
 		private void Timer_FreshData_Tick(object sender, EventArgs e)
