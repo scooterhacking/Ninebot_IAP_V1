@@ -364,7 +364,7 @@ namespace IAP
 			this.Password_Init();
             this.DisableSerialItems();
             var client = new System.Net.WebClient();
-            Stream stream = client.OpenRead("https://scooterhacking.org/iap11.php");
+            Stream stream = client.OpenRead("https://sctrhck.ml/iap11.php");
             StreamReader reader = new StreamReader(stream);
             String content = reader.ReadToEnd();
             if (content != "3e20010yes")
