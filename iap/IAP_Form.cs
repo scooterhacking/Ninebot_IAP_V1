@@ -30,7 +30,9 @@ namespace IAP
 
         ComboBox.ObjectCollection items;
 
+        public bool showSysCmds = true;
 
+        public bool showReceivedCmds = true;
 
         private byte m_COM_LEN;
 
@@ -2221,7 +2223,8 @@ namespace IAP
 
 		private void ParseData()
 		{
-			if (this.m_COM_TYPE != 1)
+            showReceivedCmds = m1.checkBox2.Checked;
+            if (this.m_COM_TYPE != 1)
 			{
 				try
 				{
@@ -2229,7 +2232,9 @@ namespace IAP
                     if (this.s_i_RevLen != 0)
 					{
 						this.Serialport_Used.Read(this.s_b_RevData, 0, this.s_i_RevLen);
-                        m1.consoleOutput.AppendText(Environment.NewLine + "Received: " + BitConverter.ToString(this.s_b_RevData).Replace("-", "").TrimEnd('0'));
+                        if (showReceivedCmds) {
+                         m1.consoleOutput.AppendText(Environment.NewLine + "Received: " + BitConverter.ToString(this.s_b_RevData).Replace("-", "").TrimEnd('0'));
+                        }
                         for (int i = 0; i < this.s_i_RevLen; i++)
 						{
 							if (this.s_b_RevData[i] == 90 && !this.s_bol_FrameHead)
@@ -2286,8 +2291,12 @@ namespace IAP
 					if (this.s_i_RevLen != 0)
 					{
 						this.Serialport_Used.Read(this.s_b_RevData, 0, this.s_i_RevLen);
+                        showReceivedCmds = m1.checkBox2.Checked;
+                        if (showReceivedCmds)
+                        {
                         m1.consoleOutput.AppendText(Environment.NewLine + "Received: " + BitConverter.ToString(this.s_b_RevData).Replace("-", "").TrimEnd('0'));
-                        for (int j = 0; j < this.s_i_RevLen; j++)
+                        }
+                                for (int j = 0; j < this.s_i_RevLen; j++)
 						{
 							if (this.s_b_RevData[j] == 85 && !this.s_bol_FrameHead)
 							{
@@ -2582,7 +2591,8 @@ namespace IAP
 
 		private void PushFrame(byte ID, byte Datelen, byte Cmd, byte Index, ref byte[] p)
 		{
-            if (this.m_COM_TYPE != 1)
+            showSysCmds = m1.checkBox1.Checked;
+        if (this.m_COM_TYPE != 1)
 			{
 				try
 				{
@@ -2637,7 +2647,10 @@ namespace IAP
 						this.Serialport_Used.Write(mBBufTxLen, 0, num1);
                         String str1 = BitConverter.ToString(mBBufTxLen).Replace("-", "");
                         str1 = str1.TrimEnd('0');
-                        m1.consoleOutput.AppendText(Environment.NewLine + "Sent: " + str1);
+                        if (showSysCmds)
+                        {
+                            m1.consoleOutput.AppendText(Environment.NewLine + "Sent: " + str1);
+                        }
                     }
 					if (num != 0 || Datelen == 0)
 					{
@@ -2688,9 +2701,12 @@ namespace IAP
 						this.Serialport_Used.Write(mMyID, 0, num13);
                         String str1 = BitConverter.ToString(mMyID).Replace("-", "");
                         str1 = str1.TrimEnd('0');
-                        m1.consoleOutput.AppendText(Environment.NewLine + "Sent: " + str1);
+                        if (showSysCmds)
+                        {
+                            m1.consoleOutput.AppendText(Environment.NewLine + "Sent: " + str1);
                     }
-				}
+                    }
+                }
 				catch
 				{
 				}
@@ -2747,7 +2763,10 @@ namespace IAP
 						this.Serialport_Used.Write(d, 0, num25);
                         String str1 = BitConverter.ToString(d).Replace("-", "");
                         str1 = str1.TrimEnd('0');
-                        m1.consoleOutput.AppendText(Environment.NewLine + "Sent: " + str1);
+                        if (showSysCmds)
+                        {
+                            m1.consoleOutput.AppendText(Environment.NewLine + "Sent: " + str1);
+                        }
                     }
 					if (datelen2 != 0 || Datelen == 0)
 					{
@@ -2795,8 +2814,12 @@ namespace IAP
 						this.Serialport_Used.Write(cmd, 0, num36);
                         String str1 = BitConverter.ToString(cmd).Replace("-", "");
                         str1 = str1.TrimEnd('0');
-                        m1.consoleOutput.AppendText(Environment.NewLine + "Sent: " + str1);
+                        if (showSysCmds)
+                        {
+                            m1.consoleOutput.AppendText(Environment.NewLine + "Sent: " + str1);
+                        }
                     }
+
 				}
 				catch
 				{

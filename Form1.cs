@@ -13,7 +13,7 @@ namespace IAP
 {
     public partial class Form1 : Form
     {
-
+        Form About = new Form();
         public Form1()
         {
             InitializeComponent();
@@ -80,6 +80,11 @@ namespace IAP
             for (int i = 0; i < NumberChars; i += 2)
                 bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
             return bytes;
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+            About.Show();
         }
     }
 }

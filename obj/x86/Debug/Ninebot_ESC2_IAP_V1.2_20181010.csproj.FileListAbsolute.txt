@@ -13,3 +13,15 @@ C:\Users\Lothean\Downloads\iapSH\iap\obj\x86\Debug\Ninebot_ESC2_IAP_V1.2_2018101
 C:\Users\Lothean\Downloads\iapSH\iap\obj\x86\Debug\IAP.exe
 C:\Users\Lothean\Downloads\iapSH\iap\obj\x86\Debug\IAP.pdb
 C:\Users\Lothean\Downloads\iapSH\iap\obj\x86\Debug\IAP.Form1.resources
+C:\Users\Lothean\Documents\GitHub\Ninebot_IAP\bin\Debug\IAP.exe
+C:\Users\Lothean\Documents\GitHub\Ninebot_IAP\bin\Debug\IAP.pdb
+C:\Users\Lothean\Documents\GitHub\Ninebot_IAP\obj\x86\Debug\Ninebot_ESC2_IAP_V1.2_20181010.csprojResolveAssemblyReference.cache
+C:\Users\Lothean\Documents\GitHub\Ninebot_IAP\obj\x86\Debug\IAP.Form1.resources
+C:\Users\Lothean\Documents\GitHub\Ninebot_IAP\obj\x86\Debug\IAP.IAP_Form.resources
+C:\Users\Lothean\Documents\GitHub\Ninebot_IAP\obj\x86\Debug\IAP.Properties.Resources.resources
+C:\Users\Lothean\Documents\GitHub\Ninebot_IAP\obj\x86\Debug\Ninebot_ESC2_IAP_V1.2_20181010.csproj.GenerateResource.Cache
+C:\Users\Lothean\Documents\GitHub\Ninebot_IAP\obj\x86\Debug\Ninebot_ESC2_IAP_V1.2_20181010.csproj.CoreCompileInputs.cache
+C:\Users\Lothean\Documents\GitHub\Ninebot_IAP\obj\x86\Debug\IAP.exe
+C:\Users\Lothean\Documents\GitHub\Ninebot_IAP\obj\x86\Debug\IAP.pdb
+C:\Users\Lothean\Documents\GitHub\Ninebot_IAP\obj\x86\Debug\Properties.Resources.resources
+C:\Users\Lothean\Documents\GitHub\Ninebot_IAP\obj\x86\Debug\IAP.about.resources
