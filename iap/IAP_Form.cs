@@ -365,14 +365,6 @@ namespace IAP
 			this.Serialport_Init();
 			this.Password_Init();
             this.DisableSerialItems();
-            var client = new System.Net.WebClient();
-            Stream stream = client.OpenRead("https://sctrhck.ml/iap11.php");
-            StreamReader reader = new StreamReader(stream);
-            String content = reader.ReadToEnd();
-            if (content != "3e20010yes")
-            {
-                this.Close();
-            }
         }
 
 		private void BLE_Connect()
